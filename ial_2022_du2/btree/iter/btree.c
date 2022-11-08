@@ -328,7 +328,7 @@ void bst_leftmost_preorder(bst_node_t *tree, stack_bst_t *to_visit)
   {
     bst_print_node(actual);
     stack_bst_push(&stack, actual);
-    actual = actual->left;
+    //actual = actual->left;
   }
   
 }
