@@ -72,52 +72,61 @@ bool bst_search(bst_node_t *tree, char key, int *value)
  */
 void bst_insert(bst_node_t **tree, char key, int value)
 {
+  bst_node_t *actual = *tree;
 
   if (*tree == NULL)
   {
-    bst_node_t *new = NULL;
+    bst_node_t *new = (bst_node_t *)malloc(sizeof(bst_node_t));
+
     new->key = key;
     new->value = value;
+    new->left = NULL;
+    new->right = NULL;
+
     *tree = new;
     return;
   }
 
-  if ((*tree)->key == key)
+  if (actual->key == key)
   {
-    (*tree)->value = value;
+    actual->value = value;
     return;
   }
 
-  if ((*tree)->key < key)
+  if (actual->key < key)
   {
-    if ((*tree)->right == NULL)
+    if (actual->right == NULL)
     {
-      bst_node_t *new = NULL;
+      bst_node_t *new = (bst_node_t *)malloc(sizeof(bst_node_t));
+
       new->key = key;
       new->value = value;
-
-      (*tree)->right = new;
+      new->left = NULL;
+      new->right = NULL;
+      actual->right = new;
 
       return;
     }
 
-    bst_insert((*tree)->right, key, value);
+    bst_insert(&actual->right, key, value);
   }
 
-  if ((*tree)->key > key)
+  if (actual->key > key)
   {
 
-    if ((*tree)->left == NULL)
+    if (actual->left == NULL)
     {
-      bst_node_t *new = NULL;
+      bst_node_t *new = (bst_node_t *)malloc(sizeof(bst_node_t));
+
       new->key = key;
       new->value = value;
-
-      (*tree)->left = new;
+      new->left = NULL;
+      new->right = NULL;
+      actual->left = new;
 
       return;
     }
-    bst_insert((*tree)->left, key, value);
+    bst_insert(&actual->left, key, value);
   }
 }
 
@@ -136,6 +145,43 @@ void bst_insert(bst_node_t **tree, char key, int value)
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree)
 {
+  bst_node_t *actual = *tree;
+  if (actual->right == NULL)
+  {
+    target->value = actual->value;
+    target->key = actual->key;
+
+    if (actual->left == NULL)
+    {
+      target->left = NULL;
+    }
+    else
+    {
+      target->left = target->left;
+    }
+    free(actual);
+    return;
+  }
+  else if (actual->right->right == NULL)
+  {
+    bst_node_t *temp = actual->right;
+
+    target->value = actual->right->value;
+    target->key = actual->right->key;
+
+    if (actual->right->left != NULL)
+    {
+      actual->right = actual->right->left;
+    }
+    else if (actual->right->left == NULL)
+    {
+      actual->right = NULL;
+    }
+    free(temp);
+    return;
+  }
+
+  bst_replace_by_rightmost(target, &actual->right);
 }
 
 /*
@@ -152,6 +198,129 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree)
  */
 void bst_delete(bst_node_t **tree, char key)
 {
+  bst_node_t *actual = *tree;
+  bst_node_t *delete = NULL;
+  if (*tree == NULL)
+  {
+    return;
+  }
+
+  if (actual->key < key)
+  {
+    // syn je klucom
+    if (actual->right != NULL &&actual->right->key == key)
+    {
+      delete = actual->right;
+      // syn nema ziadnych potomkov
+      if (actual->right->left == NULL && actual->right->right == NULL)
+      {
+        actual->right = NULL;
+        free(delete);
+        return;
+      }
+
+      // syn ma laveho potomka
+      if (actual->right->left != NULL && actual->right->right == NULL)
+      {
+        actual->right = actual->right->left;
+        free(delete);
+        return;
+      }
+
+      // syn ma praveho potomka
+      if (actual->right->left == NULL && actual->right->right != NULL)
+      {
+        actual->right = actual->right->right;
+        free(delete);
+        return;
+      }
+
+      // syn ma 2 potomkov
+      if (actual->right->left != NULL && actual->right->right != NULL)
+      {
+        bst_replace_by_rightmost(actual->right, &actual->right->left);
+        return;
+      }
+    }
+
+    bst_delete(&actual->right, key);
+    return;
+  }
+
+  else if (actual->key > key)
+  {
+    // syn je klucom
+    if (actual->left != NULL && actual->left->key == key)
+    {
+      delete = actual->left;
+      // syn nema ziadnych potomkov
+      if (actual->left->left == NULL && actual->left->right == NULL)
+      {
+        actual->left = NULL;
+        free(delete);
+        return;
+      }
+
+      // syn ma laveho potomka
+      if (actual->left->left != NULL && actual->left->right == NULL)
+      {
+        actual->left = actual->left->left;
+        free(delete);
+        return;
+      }
+
+      // syn ma praveho potomka
+      if (actual->left->left == NULL && actual->left->right != NULL)
+      {
+        actual->left = actual->left->right;
+        free(delete);
+        return;
+      }
+
+      // syn ma 2 potomkov
+      if (actual->left->left != NULL && actual->left->right != NULL)
+      {
+        bst_replace_by_rightmost(actual->left, &actual->left->left);
+        return;
+      }
+    }
+
+    bst_delete(&actual->left, key);
+    return;
+  }
+
+  if (actual->key == key)
+  {
+
+    delete = *tree;
+    if (actual->right == NULL && actual->right == NULL)
+    {
+      free(delete);
+      *tree = NULL;
+      return;
+    }
+
+    if (actual->left != NULL && actual->right == NULL)
+    {
+      *tree = actual->left;
+      free(delete);
+      return;
+    }
+
+    // syn ma praveho potomka
+    if (actual->left == NULL && actual->right != NULL)
+    {
+      *tree = actual->right;
+      free(delete);
+      return;
+    }
+    // syn ma 2 potomkov
+    if (actual->left != NULL && actual->right != NULL)
+    {
+      bst_replace_by_rightmost(*tree, &actual->left);
+      return;
+    }
+  }
 }
 
 /*
@@ -165,6 +334,18 @@ void bst_delete(bst_node_t **tree, char key)
  */
 void bst_dispose(bst_node_t **tree)
 {
+  // bst_node_t *actual = *tree;
+  if (*tree == NULL)
+  {
+    return;
+  }
+
+  bst_dispose(&(*tree)->left);
+  bst_dispose(&(*tree)->right);
+
+  free(*tree);
+  *tree = NULL;
+  return;
 }
 
 /*
@@ -195,7 +376,7 @@ void bst_inorder(bst_node_t *tree)
 {
   if (tree != NULL)
   {
-    
+
     bst_inorder(tree->left);
     bst_print_node(tree);
     bst_inorder(tree->right);

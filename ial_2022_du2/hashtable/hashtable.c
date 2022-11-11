@@ -50,7 +50,7 @@ void ht_init(ht_table_t *table)
 ht_item_t *ht_search(ht_table_t *table, char *key)
 {
   int inx = get_hash(key);
-  // ht_item_t *tmp = (*table)[get_hash(key)];
+  
   ht_item_t *tmp2 = NULL;
 
   if ((*table)[get_hash(key)] != NULL)
