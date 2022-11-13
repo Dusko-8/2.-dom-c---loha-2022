@@ -1,4 +1,4 @@
-/*
+/* Dusan Sluka
  * Binárny vyhľadávací strom — rekurzívna varianta
  *
  * S využitím dátových typov zo súboru btree.h a pripravených kostier funkcií
@@ -208,7 +208,7 @@ void bst_delete(bst_node_t **tree, char key)
   if (actual->key < key)
   {
     // syn je klucom
-    if (actual->right != NULL &&actual->right->key == key)
+    if (actual->right != NULL && actual->right->key == key)
     {
       delete = actual->right;
       // syn nema ziadnych potomkov

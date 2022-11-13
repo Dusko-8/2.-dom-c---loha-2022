@@ -1,4 +1,4 @@
-/*
+/* Dusan Sluka
  * Binárny vyhľadávací strom — iteratívna varianta
  *
  * S využitím dátových typov zo súboru btree.h, zásobníkov zo súborov stack.h a

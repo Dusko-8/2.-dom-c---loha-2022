@@ -1,4 +1,4 @@
-/*
+/* Dusan Sluka
  * Tabuľka s rozptýlenými položkami
  *
  * S využitím dátových typov zo súboru hashtable.h a pripravených kostier
